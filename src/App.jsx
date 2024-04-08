@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Navbar() {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="navbar">
+      <h1>Recipe App</h1>
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Recipes</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  );
 }
 
-export default App
+function Footer() {
+  return (
+    <div className="footer">
+      <p>&copy; 2024 Recipe App. All rights reserved.</p>
+    </div>
+  );
+}
+
+function RecipeList({ recipes }) {
+  return (
+    <div className="recipe-container">
+      {recipes.map(recipe => (
+        <div key={recipe.id} className="recipe" onClick={() => document.title = recipe.title}>
+          <h2>{recipe.title}</h2>
+          <p><strong>Description:</strong> {recipe.description}</p>
+          <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
+          <p><strong>Directions:</strong> {recipe.directions}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  useEffect(() => {
+    async function fetchRecipes() {
+      try {
+        const response = await fetch('https://api.example.com/recipes');
+        const data = await response.json();
+        return data.recipes;
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+        return [];
+      }
+    }
+
+    async function mountComponent() {
+      const recipes = await fetchRecipes();
+      setRecipes(recipes);
+    }
+
+    function unmountComponent() {
+      console.log('Unmounted');
+    }
+
+    mountComponent();
+
+    return () => unmountComponent();
+  }, []);
+
+  const [recipes, setRecipes] = React.useState([]);
+
+  return (
+    <div>
+      <Navbar />
+      <RecipeList recipes={recipes} />
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
+
